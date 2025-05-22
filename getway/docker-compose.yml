@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      - AUTH_SERVICE_HOST=auth-service
+      - AUTH_SERVICE_PORT=3001
+      - USER_SERVICE_HOST=user-service
+      - USER_SERVICE_PORT=3000
+    depends_on:
+      - auth-service
+      - user-service
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    external: true

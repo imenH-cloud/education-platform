@@ -35,5 +35,5 @@ export class Student {
     parent: Parent;
 
     @ManyToOne(() => Classroom, classroom => classroom.students)
-    classroom: Classroom;
+    classroom: number
 }

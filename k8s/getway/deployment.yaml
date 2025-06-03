@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: getway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: getway
+  template:
+    metadata:
+      labels:
+        app: getway
+    spec:
+      containers:
+        - name: getway
+          image: getway:latest
+          ports:
+            - containerPort: 3000

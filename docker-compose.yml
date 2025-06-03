@@ -1,8 +1,7 @@
-version: '3.8'
-
 services:
   postgres:
-    image: postgres:13
+    image: postgres:15
+    container_name: postgres-db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -11,13 +10,32 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+
+  api-gateway:
+    build:
+      context: ./getway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - USER_SERVICE_URL=http://user-service:3002
+      - AUTH_SERVICE_URL=http://auth-service:3001
+    depends_on:
+      - user-service
+      - auth-service
+    networks:
+      - microservices-network
 
   user-service:
     build:
       context: ./user
       dockerfile: Dockerfile
+    container_name: user-service
     ports:
-      - "3000:3000"
+      - "3002:3002"
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
@@ -29,7 +47,7 @@ services:
     networks:
       - microservices-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -38,21 +56,22 @@ services:
     build:
       context: ./auth
       dockerfile: Dockerfile
+    container_name: auth-service
     ports:
       - "3001:3001"
     environment:
-      - USER_SERVICE_URL=http://user-service:3000
+      - USER_SERVICE_URL=http://user-service:3002
       - USER_SERVICE_HOST=user-service
-      - USER_SERVICE_PORT=3000
+      - USER_SERVICE_PORT=3002
+    depends_on:
+      - user-service
     networks:
       - microservices-network
-    depends_on:
-      user-service:
-        condition: service_healthy
+
+volumes:
+  postgres_data:
 
 networks:
   microservices-network:
     driver: bridge
 
-volumes:
-  postgres_data:

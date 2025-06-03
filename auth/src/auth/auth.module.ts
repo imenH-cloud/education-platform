@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalStrategy } from './local-passport/local.strategy';
@@ -7,25 +6,27 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { jwtConstants } from './constants';
+import { HttpModule } from '@nestjs/axios'; // ✅ Ajouté
 
 @Module({
-    imports: [
-        ClientsModule.register([
-            {
-                name: 'USER_SERVICE',
-                transport: Transport.TCP,
-                options: {
-                    host: process.env.USER_SERVICE_HOST || 'localhost',
-                    port: process.env.USER_SERVICE_PORT ? parseInt(process.env.USER_SERVICE_PORT, 10) : 3000,
-                },
-            },
-        ]),
-        PassportModule,
-        JwtModule.register({
-            secret: jwtConstants.secret,
-            signOptions: { expiresIn: '600000s' },
-        }),
-        ],
+  imports: [
+    HttpModule, // ✅ Nécessaire pour HttpService
+    ClientsModule.register([
+      {
+        name: 'USER_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host: process.env.USER_SERVICE_HOST || 'localhost',
+          port: parseInt(process.env.USER_SERVICE_PORT || '3001', 10),
+        },
+      },
+    ]),
+    PassportModule,
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '600000s' },
+    }),
+  ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
   exports: [AuthService],
 })

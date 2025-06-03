@@ -7,33 +7,41 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get('/')
-  find():any {
+  // Health check
+  @Get('health')
+  healthCheck() {
+    return { status: 'ok' };
+  }
+
+  // Liste des utilisateurs
+  @Get()
+  find(): any {
     return this.userService.findUsers();
   }
 
-  @Post('/')
-  async createUser(@Body() userDto: CreateUserDto,) {
+  @Post()
+  async createUser(@Body() userDto: CreateUserDto) {
     return this.userService.createUser(userDto);
   }
-  
-  @Patch('/:id')
-  async replaceById(@Param('id') id: number, @Body() userDto: UpdateUserDto,) {
+
+  @Patch(':id')
+  async replaceById(@Param('id') id: number, @Body() userDto: UpdateUserDto) {
     return this.userService.replaceById(id, userDto);
   }
 
-  @Get('/:id')
+  @Get(':id')
   findById(@Param('id') id: number) {
     return this.userService.findById(id);
   }
 
-  @Delete('/:id')
+  @Delete(':id')
   remove(@Param('id') id: number) {
     return this.userService.remove(id);
   }
 
-  @Post('/deleteMultipleUser')
+  @Post('deleteMultipleUser')
   removeMultiple(@Body() tab: any) {
     return this.userService.removeMultiple(tab);
   }
 }
+

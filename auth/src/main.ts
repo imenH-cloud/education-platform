@@ -4,15 +4,19 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
   const config = new DocumentBuilder()
-  .setTitle('education plateform')
-  .setDescription('education plateform api ')
-  .setVersion('1.0')
-  .addTag('apieduca')
-  .build();
-const documentFactory = () => SwaggerModule.createDocument(app, config);
-SwaggerModule.setup('api', app, documentFactory);
-app.enableCors()
-  await app.listen(process.env.PORT ?? 3000);
+    .setTitle('Education Platform - Auth Service')
+    .setDescription('API documentation for the Auth microservice')
+    .setVersion('1.0')
+    .addTag('auth')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
+  app.enableCors();
+
+  await app.listen(3001); // Auth service port
 }
 bootstrap();

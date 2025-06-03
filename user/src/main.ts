@@ -1,29 +1,28 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  const config = new DocumentBuilder()
-  .setTitle('education plateform')
-  .setDescription('education plateform api ')
-  .setVersion('1.0')
-  .addTag('apieduca')
-  .build();
-const documentFactory = () => SwaggerModule.createDocument(app, config);
-SwaggerModule.setup('api', app, documentFactory);
-app.enableCors()
-  await app.listen(process.env.PORT ?? 3000);
-
-  const microservice = app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.TCP,
-    options: {
-      host: '0.0.0.0',
-      port: 3000,
-    },
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
   });
 
-  await app.startAllMicroservices();
+  // Swagger config
+  const config = new DocumentBuilder()
+    .setTitle('Education Platform - User Service')
+    .setDescription('API documentation for the User microservice')
+    .setVersion('1.0')
+    .addTag('user')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
+  app.enableCors();
+
+  // Écoute sur le port HTTP 3002
+  await app.listen(3002, '0.0.0.0');
+
+  console.log(`User service is running on ${await app.getUrl()}`);
 }
 bootstrap();

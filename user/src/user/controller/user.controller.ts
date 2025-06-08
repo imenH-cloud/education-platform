@@ -33,7 +33,11 @@ export class UserController {
   findById(@Param('id') id: number) {
     return this.userService.findById(id);
   }
-
+   @Get('email/:email')
+  Email(@Param('email')email: string) {
+    return this.userService.findOne(email);
+  }
+findOne
   @Delete(':id')
   remove(@Param('id') id: number) {
     return this.userService.remove(id);

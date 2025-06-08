@@ -96,7 +96,7 @@ export class UserService {
   async findOne(email: string): Promise<any> {
     return await this.userRepository.findOne({
       where: { email: ILike(email) },
-      relations: ['role'], // Corrected here
+     
     });
   }
 

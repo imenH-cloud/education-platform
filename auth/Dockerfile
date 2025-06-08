@@ -1,26 +1,16 @@
 # Étape 1 : Build de l'application
-FROM node:20-alpine AS builder
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci
-
-COPY . .
-RUN npm run build
-
 FROM node:20-alpine
 
 WORKDIR /app
 
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
+COPY package*.json ./
 
-ENV NODE_ENV=production
+RUN npm install
+
+COPY . .
+
+RUN npm run build
 
 EXPOSE 3001
 
-USER node
-
-CMD ["node", "dist/main.js"]
+CMD ["node", "dist/main"]

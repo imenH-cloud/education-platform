@@ -73,4 +73,27 @@ pipeline {
                     sh '''
                     export KUBECONFIG=${KUBECONFIG}
 
-                    sed -i "s|image: auth-service:latest|im
+                    sed -i "s|image: auth-service:latest|image: ${DOCKER_REGISTRY}/${PROJECT_NAME}/auth:${BUILD_NUMBER}|g" ./k8s/auth-service.yaml
+                    sed -i "s|image: user-service:latest|image: ${DOCKER_REGISTRY}/${PROJECT_NAME}/user:${BUILD_NUMBER}|g" ./k8s/user-service.yaml
+                    sed -i "s|image: api-gateway:latest|image: ${DOCKER_REGISTRY}/${PROJECT_NAME}/gateway:${BUILD_NUMBER}|g" ./k8s/gateway.yaml
+
+                    kubectl apply -f ./k8s/postgres.yaml
+                    kubectl apply -f ./k8s/user-service.yaml
+                    kubectl apply -f ./k8s/auth-service.yaml
+                    kubectl apply -f ./k8s/gateway.yaml
+                    kubectl apply -f ./k8s/ingress.yaml
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Pipeline completed successfully!'
+        }
+        failure {
+            echo '❌ Pipeline failed!'
+        }
+    }
+}

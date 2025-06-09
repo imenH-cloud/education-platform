@@ -1,13 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
-import { UserService } from './user.service';
+import { UserService } from '../service/user.service';
 
 describe('UserController', () => {
   let controller: UserController;
-
-  const mockUserService = {
-    findAll: jest.fn().mockResolvedValue([{ id: 1, name: 'Imen' }]),
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -15,7 +11,9 @@ describe('UserController', () => {
       providers: [
         {
           provide: UserService,
-          useValue: mockUserService,
+          useValue: {
+            findAll: jest.fn().mockReturnValue([{ id: 1, name: 'Imen' }]),
+          },
         },
       ],
     }).compile();
@@ -27,7 +25,7 @@ describe('UserController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should return users', async () => {
+  it('should return all users', async () => {
     expect(await controller.findAll()).toEqual([{ id: 1, name: 'Imen' }]);
   });
 });
